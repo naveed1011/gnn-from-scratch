@@ -1,6 +1,6 @@
 # Graph Neural Networks from Scratch using pytorch only
 
-I wrote GCN, GraphSAGE, GAT and GIN in **plain PyTorch — no PyG, no DGL** and
+I wrote GCN, GraphSAGE, GAT and GIN in **PyTorch — no PyG, no DGL** and
 then tested each one is numerically identical to `torch_geometric` by copying
 the weights across and comparing outputs in float64. Every number in this README
 comes from a real run uisng the free Kaggle Tesla T4; the executed
@@ -33,12 +33,9 @@ that it was correct.
 | **Tests** | 90 test functions (105 parametrized cases): hand-computed layer outputs, scatter primitives vs brute-force loops, static AST checks, and mutation tests that prove the equivalence checks can fail |
 | **Runtime** | ~10–15 min for everything on a T4; Cora alone trains in seconds on CPU |
 
-Deliberately **out of scope** to keep the project focused: neighbour sampling,
-heterogeneous graphs, edge features, link prediction, graph transformers.
-
 ---
 
-## Results (real numbers from that Kaggle run)
+## Results (actual numbers from that Kaggle run)
 
 Environment: Python 3.13.16 · PyTorch 2.11.0+cu130 · Tesla T4 · torch_geometric 2.8.1.
 
@@ -149,7 +146,7 @@ normalisation.
 `tests/test_index_convention.py` parses the AST of every layer and enforces that
 `scatter_*` always receives a **destination** index and every `forward` gathers
 from a **source** index. It runs without torch installed, and it is the specific
-guard against the `src`/`dst` swap above.
+guard against the `src`/`dst` swap given above.
 
 ```bash
 pytest                       # offline, fast, no downloads
@@ -207,7 +204,7 @@ connections are the obvious next experiment but were not run here.)*
 Splitting GAT's learned coefficients into same-class and cross-class edges:
 same-class mean **0.2095** vs cross-class **0.1744**, ratio **1.20**. The
 distributions overlap heavily, and all 8 heads agree (each head's ratio is also
-~1.20 — no specialisation). That is the honest result, and a useful corrective
+~1.20 — no specialisation). That is the result, and a useful corrective
 to figures that make attention look like a perfect edge selector.
 
 ![attention distributions](results/07_attention.png)
@@ -216,7 +213,7 @@ to figures that make attention look like a perfect edge selector.
 
 ---
 
-## What I learned (the things that silently break)
+## What I learned (things that silently break)
 
 Collected the hard way. None of these raise an exception.
 
@@ -230,15 +227,6 @@ Collected the hard way. None of these raise an exception.
 | Reporting max test accuracy over epochs | inflated by 1–2 points | both numbers recorded; only the honest one (best-val epoch) reported |
 | Forgetting MUTAG's 66.5% baseline | "75% accuracy" that beats nothing | `majority_accuracy()` printed everywhere |
 | A dataset leak in the triangle task | `sum` appeared to beat `mean` at 88% | rebuilt classes as matched pairs; the "win" vanished to chance |
-
-The triangle leak is the one I keep coming back to. The first version showed
-`sum` pooling beating `mean`, which looked like the Weisfeiler-Lehman bound
-turning into a number. It was a leak: triangle-free random graphs only survive
-rejection sampling when they are sparse, so the "no triangle" class had ~21
-edges against ~34, and **edge density alone predicted the label at 88%** with no
-GNN at all. Rebuilding the data as matched pairs drops that shortcut to exactly
-50%, and with it the "win". The lesson is the same as the `src`/`dst` swap:
-**a result that matches the story you wanted is the one to check hardest.**
 
 ---
 
@@ -264,7 +252,7 @@ gnn-from-scratch/
 └── results/                     # the 12 figures above, committed (see results/README.md)
 ```
 
-The `kaggle/` template notebook is **generated** from the package by
+The `kaggle/` template notebook is **generated** from that package by
 `scripts/build_kaggle_notebook.py`, so the two copies cannot drift apart.
 
 ---
@@ -281,46 +269,10 @@ python scripts/run_selftest.py           # is the from-scratch code correct?
 python scripts/train_node_classification.py
 ```
 
-Minimal example:
-
-```python
-from gnn_lab import load_cora, GCNScratch, train_node, set_seed
-set_seed(0)
-data = load_cora()                                            # downloads ~1 MB once
-model = GCNScratch(data.num_features, 16, data.num_classes)   # 2 layers, 16 hidden
-result = train_node(model, data, model_name="GCN", epochs=200)
-print(result.summary_line())
-```
-
 **Requirements:** Python ≥ 3.10, PyTorch ≥ 2.0. `torch_geometric` is **optional**
 — used only as a reference oracle for the equivalence checks. `scipy` is needed
 for the Planetoid loader; without it, `load_cora(source="linqs")` gives the same
 graph from plain text with no scipy at all.
-
-## Running on Kaggle (free T4)
-
-`kaggle/gnn_from_scratch_t4.ipynb` is fully self-contained — the entire library
-is inlined, so it needs no repository checkout.
-
-1. kaggle.com → **New Notebook**
-2. Upload that file (or paste its contents)
-3. Right panel → **Accelerator** → **GPU T4 x2**
-4. **Run All** (~10–15 min)
-
-It installs `torch_geometric` itself for the equivalence section and degrades
-gracefully if that fails. Everything runs on CPU too — Cora is small — in
-roughly 25 minutes. Figures are written to `results/`; use **Output → Download**
-to keep them.
-
-## Reproducing everything
-
-```bash
-make selftest        # equivalence checks vs torch_geometric
-make test            # full offline test suite
-make results         # Cora + MUTAG + ablations -> results/*.json and figures
-make notebook        # regenerate kaggle/gnn_from_scratch_t4.ipynb from the package
-make all             # everything above
-```
 
 Seeding is handled by `gnn_lab.utils.set_seed`. Bitwise reproducibility on CUDA
 additionally requires `torch.use_deterministic_algorithms(True)` (opt-in, slower);
@@ -328,12 +280,3 @@ scatter reductions are non-deterministic in float order by default, so expect
 small run-to-run variation even with a fixed seed.
 
 ---
-
-## References
-
-- Kipf & Welling. *Semi-Supervised Classification with Graph Convolutional
-  Networks.* ICLR 2017.
-- Hamilton, Ying & Leskovec. *Inductive Representation Learning on Large
-  Graphs.* NeurIPS 2017.
-- Veličković et al. *Graph Attention Networks.* ICLR 2018.
-- Xu et al. *How Powerful are Graph Neural Networks?* (GIN). ICLR 2019.
