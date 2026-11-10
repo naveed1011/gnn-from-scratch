@@ -1,0 +1,83 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gnn-lab"
+version = "1.0.0"
+description = "Graph Neural Networks (GCN, GraphSAGE, GAT, GIN) written from scratch in plain PyTorch, with numerical equivalence checks against torch_geometric."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Naveed Ahmad", email = "naveed1011@users.noreply.github.com" }]
+keywords = [
+    "graph-neural-networks", "gnn", "gcn", "graphsage", "gat", "gin",
+    "message-passing", "pytorch", "deep-learning", "from-scratch",
+    "node-classification", "graph-classification", "cora", "oversmoothing",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Education",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+    "torch>=2.0",
+    "numpy>=1.23",
+]
+
+[project.optional-dependencies]
+viz = ["matplotlib>=3.6", "networkx>=2.8", "scikit-learn>=1.1"]
+planetoid = ["scipy>=1.9"]
+pyg = ["torch_geometric>=2.4"]
+dev = ["pytest>=7.0", "pytest-cov>=4.0"]
+all = [
+    "scipy>=1.9", "matplotlib>=3.6", "networkx>=2.8",
+    "scikit-learn>=1.1", "torch_geometric>=2.4",
+    "pytest>=7.0", "pytest-cov>=4.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/naveed1011/gnn-from-scratch"
+Repository = "https://github.com/naveed1011/gnn-from-scratch"
+Issues = "https://github.com/naveed1011/gnn-from-scratch/issues"
+
+[tool.setuptools.packages.find]
+include = ["gnn_lab*"]
+exclude = ["tests*", "scripts*", "notebooks*", "docs*"]
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+testpaths = ["tests"]
+addopts = "-ra -q --strict-markers -m 'not network'"
+markers = [
+    "network: test needs to download a dataset (deselect with `-m 'not network'`)",
+]
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore:.*scipy.sparse.csr.*:Warning",
+]
+
+[tool.coverage.run]
+source = ["gnn_lab"]
+omit = ["gnn_lab/viz.py"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B"]
+ignore = [
+    "E731",   # lambda assignment -- used deliberately in the model builders
+    "B008",   # function call in default argument -- torch.device(...)
+]
+
+[tool.ruff.lint.per-file-ignores]
+"notebooks/*" = ["E402"]
+"scripts/*" = ["E402"]

@@ -1,0 +1,64 @@
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.eggs/
+downloads/
+eggs/
+parts/
+sdist/
+wheels/
+pip-wheel-metadata/
+
+# ---- virtual environments ----
+.venv/
+venv/
+env/
+ENV/
+
+# ---- test / tooling caches ----
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+.mypy_cache/
+.ruff_cache/
+.cache/
+
+# ---- Jupyter ----
+.ipynb_checkpoints/
+*/.ipynb_checkpoints/*
+
+# ---- dataset cache (downloaded on first use, ~1.5 MB total) ----
+# Anchored with a leading slash ON PURPOSE: an unanchored `data/` matches at
+# every depth and would silently exclude the `gnn_lab/data/` subpackage too.
+/data/
+
+# ---- generated results ----
+# The *.png figures are COMMITTED -- they are the reference output of the Kaggle
+# T4 run (Nov 2026) and are linked from the README. Only regenerable
+# JSON/CSV artefacts stay ignored.
+results/*.json
+results/*.pdf
+results/*.csv
+!results/README.md
+!results/*.png
+
+# ---- OS / editor ----
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# ---- Kaggle ----
+kaggle.json
+*.kaggle-metadata

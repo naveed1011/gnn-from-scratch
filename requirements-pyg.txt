@@ -1,0 +1,9 @@
+-r requirements.txt
+
+# Reference oracle for the equivalence checks in gnn_lab/equivalence.py.
+# Optional: the from-scratch code has no PyG dependency at all.
+# Without it, every PyG check reports SKIPPED rather than failing.
+#
+# PyG 2.x installs from plain pip -- the old torch-scatter / torch-sparse wheels
+# are no longer required for the layers used here.
+torch_geometric>=2.4

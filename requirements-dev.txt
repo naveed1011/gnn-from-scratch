@@ -1,0 +1,8 @@
+-r requirements-pyg.txt
+
+# Development / testing only.
+pytest>=7.0
+pytest-cov>=4.0
+
+# style / static analysis (used by `make lint`)
+ruff>=0.4

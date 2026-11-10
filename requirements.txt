@@ -1,0 +1,10 @@
+# Core runtime. Everything in gnn_lab works with just these.
+# torch_geometric is NOT here -- it is optional and lives in requirements-pyg.txt.
+torch>=2.0
+numpy>=1.23
+scipy>=1.9          # only for load_cora(source="planetoid"); the "linqs" source needs neither
+matplotlib>=3.6
+
+# Optional, for figures in notebooks 01/03/04
+networkx>=2.8
+scikit-learn>=1.1
